@@ -24,3 +24,7 @@ li {
   display: flex;
   align-items: center;
 }
+
+body {
+  background-color: #8a2be2; /* 보라색 배경 */
+}
