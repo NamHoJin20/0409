@@ -6,10 +6,13 @@
 */
 import React from "react";
 import styles from "@/styles/TodoList.module.css";
+import { Button } from "@/components/ui/button";
 
 // TodoItem 컴포넌트를 정의합니다.
 const TodoItem = ({ todo, onToggle, onDelete }) => {
   // 각 할 일 항목을 렌더링합니다.
+  <Button variant="outline">Button</Button>
+
   return (
     <li className={styles.todoItem}>
       {/* 체크박스를 렌더링하고, 체크박스의 상태를 할 일의 완료 상태와 동기화합니다.

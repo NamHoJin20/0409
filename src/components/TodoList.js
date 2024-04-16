@@ -8,12 +8,14 @@
 import React, { useState } from "react";
 import TodoItem from "@/components/TodoItem";
 import styles from "@/styles/TodoList.module.css";
+import {Input} from "@/components/ui/input";
 
 // TodoList 컴포넌트를 정의합니다.
 const TodoList = () => {
   // 상태를 관리하는 useState 훅을 사용하여 할 일 목록과 입력값을 초기화합니다.
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState("");
+  <Input />
 
   // addTodo 함수는 입력값을 이용하여 새로운 할 일을 목록에 추가하는 함수입니다.
   const addTodo = () => {
