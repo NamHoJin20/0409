@@ -57,21 +57,22 @@ const TodoList = () => {
   };
 
   // addTodo 함수는 입력값을 이용하여 새로운 할 일을 목록에 추가하는 함수입니다.
-  const addTodo = async() => {
+  const addTodo = async () => {
     // 입력값이 비어있는 경우 함수를 종료합니다.
     if (input.trim() === "") return;
-    // 기존 할 일 목록에 새로운 할 일을 추가하고, 입력값을 초기화합니다.
-    // {
-    //   id: 할일의 고유 id,
-    //   text: 할일의 내용,
-    //   completed: 완료 여부,
-    // }
-    // ...todos => {id: 1, text: "할일1", completed: false}, {id: 2, text: "할일2", completed: false}}, ..
-   // Firestore 에 추가한 할 일을 저장합니다.
-   const docRef = await addDoc(todoCollection, {
-    text: input,
-    completed: false,
-  });
+  
+    // Firestore에 할 일을 추가하고 생성된 문서의 ID와 등록 날짜를 받아옵니다.
+    const docRef = await addDoc(todoCollection, {
+      text: input,
+      completed: false,
+      createdAt: serverTimestamp() // Firestore에서 생성된 타임스탬프
+    });
+  
+    // 새로운 할 일을 상태에 추가합니다.
+    setTodos([...todos, { id: docRef.id, text: input, completed: false, createdAt: new Date() }]);
+    setInput(""); // 입력값 초기화
+  };
+  
 
   // id 값을 Firestore 에 저장한 값으로 지정합니다.
   setTodos([...todos, { id: docRef.id, text: input, completed: false }]);
@@ -142,6 +143,6 @@ const TodoList = () => {
       </ul>
     </div>
   );
-};
+
 
 export default TodoList;
