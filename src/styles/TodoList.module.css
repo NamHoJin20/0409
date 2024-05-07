@@ -1,3 +1,5 @@
+/* TodoList.module.css */
+
 .container {
   max-width: 600px;
   margin: 20px auto;
@@ -45,15 +47,13 @@ button.addButton:hover {
   color: #333;
 }
 
-.todoItem.completed .todoText {
-  text-decoration: line-through;
-  color: #888;
+/* 완료된 할 일의 배경색과 텍스트 색상을 변경하는 스타일 */
+.completedTodo {
+  background-color: #0070f3; /* 파란색 배경색 지정 */
 }
 
-.todoItem.completed button.completeButton {
-  background-color: #ccc;
-  color: #333;
-  border: 1px solid #ccc;
+.completed {
+  text-decoration: line-through solid #888; /* 더 강조된 line-through 스타일 적용 */
 }
 
 .completeButton {

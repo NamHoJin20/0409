@@ -82,33 +82,31 @@ const TodoList = () => {
       return;
     }
     
-    // 할 일을 만료일을 기준으로 정렬하기 위해 새로운 할 일을 정의합니다.
+    // Firestore에 할 일을 추가합니다.
+    const docRef = await addDoc(todoCollection, {
+      userName: data?.user?.name, // 사용자의 닉네임을 해당 할 일의 데이터에 저장합니다.
+      text: input,
+      dueDate: dueDate,
+      completed: false,
+    });
+
+    // 새로 추가한 할 일을 정의합니다.
     const newTodo = {
-      id: Date.now().toString(), // 임시 id
+      id: docRef.id, // Firestore에서 할 일의 id를 가져와 설정합니다.
+      userName: data?.user?.name, // 사용자의 닉네임을 할 일 데이터에 저장합니다.
       text: input,
       dueDate: dueDate,
       completed: false,
     };
-  
+
     // 정렬된 할 일 목록을 만듭니다.
     const sortedTodos = [...todos, newTodo].sort((a, b) => {
       return new Date(a.dueDate) - new Date(b.dueDate);
     });
-  
-    // Firestore에 할 일을 추가합니다.
-    const docRef = await addDoc(todoCollection, {
-      userName: data?.user?.name,
-      text: input,
-      dueDate: dueDate,
-      completed: false,
-    });
-  
-    // Firestore에 추가한 할 일의 id를 가져옵니다.
-    newTodo.id = docRef.id;
-  
+
     // 정렬된 할 일 목록을 상태로 설정합니다.
     setTodos(sortedTodos);
-  
+
     // 입력값 초기화
     setInput("");
     setDueDate("");
@@ -117,41 +115,44 @@ const TodoList = () => {
   
 
   // toggleTodo 함수는 체크박스를 눌러 할 일의 완료 상태를 변경하는 함수입니다.
-  const toggleTodo = (id) => {
+const toggleTodo = async (id) => {
+  // 해당 id를 가진 할 일을 찾습니다.
+  const todo = todos.find((todo) => todo.id === id);
+
+  // 현재 로그인한 사용자의 닉네임과 할 일의 소유자 닉네임을 비교하여 같은 경우에만 수정합니다.
+  if (data?.user?.name === todo.userName) {
     // 할 일 목록에서 해당 id를 가진 할 일의 완료 상태를 반전시킵니다.
     setTodos(
-      // todos.map((todo) =>
-      //   todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      // )
-      // ...todo => id: 1, text: "할일1", completed: false
-      todos.map((todo) => {
-        if (todo.id === id) {
-          // Firestore 에서 해당 id를 가진 할 일을 찾아 완료 상태를 업데이트합니다.
-          const todoDoc = doc(todoCollection, id);
-          updateDoc(todoDoc, { completed: !todo.completed });
-          // ...todo => id: 1, text: "할일1", completed: false
-          return { ...todo, completed: !todo.completed };
-        } else {
-          return todo;
-        }
-      })
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      )
     );
-  };
 
-  // deleteTodo 함수는 할 일을 목록에서 삭제하는 함수입니다.
-  const deleteTodo = (id) => {
+    // Firestore 에서 해당 id를 가진 할 일을 찾아 완료 상태를 업데이트합니다.
+    const todoDoc = doc(todoCollection, id);
+    await updateDoc(todoDoc, { completed: !todo.completed });
+  } else {
+    console.log("Permission denied: You can only modify your own todos.");
+  }
+};
+
+// deleteTodo 함수는 할 일을 목록에서 삭제하는 함수입니다.
+const deleteTodo = async (id) => {
+  // 해당 id를 가진 할 일을 찾습니다.
+  const todo = todos.find((todo) => todo.id === id);
+
+  // 현재 로그인한 사용자의 닉네임과 할 일의 소유자 닉네임을 비교하여 같은 경우에만 삭제합니다.
+  if (data?.user?.name === todo.userName) {
     // Firestore 에서 해당 id를 가진 할 일을 삭제합니다.
     const todoDoc = doc(todoCollection, id);
-    deleteDoc(todoDoc);
+    await deleteDoc(todoDoc);
 
     // 해당 id를 가진 할 일을 제외한 나머지 목록을 새로운 상태로 저장합니다.
-    // setTodos(todos.filter((todo) => todo.id !== id));
-    setTodos(
-      todos.filter((todo) => {
-        return todo.id !== id;
-      })
-    );
-  };
+    setTodos(todos.filter((todo) => todo.id !== id));
+  } else {
+    console.log("Permission denied: You can only delete your own todos.");
+  }
+};
 
   // 컴포넌트를 렌더링합니다.
   return (
